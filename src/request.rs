@@ -2,7 +2,7 @@ use self::error::{RequestEncodingDismatchError, RequestResult};
 
 pub(super) mod error;
 
-enum Request {
+pub(crate) enum Request {
     Model(String),
     Image(String),
     Code(String),
@@ -17,7 +17,7 @@ impl Request {
     /// - "wgsl" | "glsl" => **Code**,
     /// - "svg" => **Icon**,
     /// - _ => **API**,
-    fn from_name(name: &str) -> Self {
+    pub(crate) fn from_name(name: &str) -> Self {
         let suffix: Vec<_> = name.split(".").collect();
         match suffix[1] {
             "obj" => Self::Model(name.to_owned()),
@@ -38,7 +38,7 @@ impl Request {
         }
     }
 
-    async fn request_utf8(&self) -> RequestResult<String> {
+    pub(crate) async fn request_utf8(&self) -> RequestResult<String> {
         let url = match self {
             Self::Model(_) | Self::Code(_) | Self::Icon(_) | Self::API(_) => self.url(),
             _ => Err(RequestEncodingDismatchError {
@@ -47,7 +47,7 @@ impl Request {
             })?,
         };
 
-        Ok(gloo::net::http::Request::post(&url)
+        Ok(gloo::net::http::Request::get(&url)
             .send()
             .await?
             .text()
@@ -63,7 +63,7 @@ impl Request {
             })?,
         };
 
-        Ok(gloo::net::http::Request::post(&url)
+        Ok(gloo::net::http::Request::get(&url)
             .send()
             .await?
             .binary()

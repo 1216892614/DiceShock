@@ -1,4 +1,5 @@
 use yew::prelude::*;
+use super::img::*;
 
 #[function_component(SideMenu)]
 pub(crate) fn side_menu() -> Html {
@@ -15,17 +16,13 @@ pub(crate) fn side_menu() -> Html {
         <>
             <div
                 {onclick}
-                style="
-                    height: 40px;
-                    width: 40px;
-                    min-height: 40px;
-                    min-width: 40px;
-                    margin: 10px;
-                    background-color: rgb(33, 37, 43);
-                    border-radius: 5px;
-                    Box-shadow: -2px 2px 5px rgba(21, 22, 24, 0.6);
-                "
-            ></div>
+                class="hide_button"
+            >
+                <SVG
+                    file_name={"DiceShock_angle.svg"}
+                    style={format!("margin: 5px;{}", if *is_menu_hide {""} else {"transform:rotate(180deg);"})}
+                />
+            </div>
             <div
                 style={format!("
                     height: 100%;
