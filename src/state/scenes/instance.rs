@@ -13,7 +13,14 @@ impl Instance {
         self.position
     }
 
-    pub fn toword(&self, other: cgmath::Point3<i32>) -> usize {
+    /// left handed position
+    /// - self at front of the other
+    ///     - +1
+    /// - self at right of the other
+    ///     - +2
+    /// - self at above of the other
+    ///     - +4
+    pub fn toward(&self, other: cgmath::Point3<i32>) -> usize {
         let mut ans = 0;
 
         if self.position.x >= other.x {
