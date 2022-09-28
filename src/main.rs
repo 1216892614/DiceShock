@@ -1,3 +1,4 @@
+use gloo::console::log;
 use yew::prelude::*;
 
 /// parts of pages
@@ -8,9 +9,15 @@ mod error;
 mod request;
 /// resources types and methods
 mod resources;
+/// runtime state
+mod state;
 
 #[function_component(App)]
 fn app() -> Html {
+    let using_tool = Callback::from(|u| {
+        log!(format!("{:?}", u));
+    });
+
     html!(
         <>
             <components::header::Header></ components::header::Header>
@@ -25,7 +32,7 @@ fn app() -> Html {
             >
                 <components::sketchpad::Sketchpad />
                 <div style="height: 100%; width: 100%; margin: 0 0 0 -100%;">
-                    <components::kit_bar::KitBar />
+                    <components::kit_bar::KitBar {using_tool}/>
                     <div style="height: 100%; width: 100%"></div>
                     <components::side_menu::SideMenu />
                 </div>

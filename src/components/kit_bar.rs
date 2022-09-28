@@ -1,18 +1,16 @@
+use crate::state::using_tool::UsingTool;
+
 use super::img::*;
 use gloo::console::log;
 use yew::prelude::*;
 
-pub(crate) enum UsingTool {
-    Roll,
-    Stack,
-    Select,
-    FormatBrush,
-    Eyedropper,
-    Delete,
+#[derive(Properties, Clone, PartialEq)]
+pub(crate) struct Props {
+    pub(crate) using_tool: Callback<UsingTool>,
 }
 
 #[function_component(KitBar)]
-pub(crate) fn kit_bar() -> Html {
+pub(crate) fn kit_bar(props: &Props) -> Html {
     let using_tool_state = use_state(|| UsingTool::Select);
     let bar_position_state = use_state(|| 10);
     let is_drug_state = use_state(|| false);
@@ -46,49 +44,61 @@ pub(crate) fn kit_bar() -> Html {
 
     let onclick_roll = {
         let using_tool_state = using_tool_state.clone();
+        let using_tool = props.using_tool.clone();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
-            using_tool_state.set(UsingTool::Roll)
+            using_tool_state.set(UsingTool::Roll);
+            using_tool.emit(UsingTool::Roll);
         })
     };
 
     let onclick_stack = {
         let using_tool_state = using_tool_state.clone();
+        let using_tool = props.using_tool.clone();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
-            using_tool_state.set(UsingTool::Stack)
+            using_tool_state.set(UsingTool::Stack);
+            using_tool.emit(UsingTool::Stack);
         })
     };
 
     let onclick_select = {
         let using_tool_state = using_tool_state.clone();
+        let using_tool = props.using_tool.clone();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
-            using_tool_state.set(UsingTool::Select)
+            using_tool_state.set(UsingTool::Select);
+            using_tool.emit(UsingTool::Select);
         })
     };
 
     let onclick_format_brush = {
         let using_tool_state = using_tool_state.clone();
+        let using_tool = props.using_tool.clone();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
-            using_tool_state.set(UsingTool::FormatBrush)
+            using_tool_state.set(UsingTool::FormatBrush);
+            using_tool.emit(UsingTool::FormatBrush);
         })
     };
 
     let onclick_eyedropper = {
         let using_tool_state = using_tool_state.clone();
+        let using_tool = props.using_tool.clone();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
-            using_tool_state.set(UsingTool::Eyedropper)
+            using_tool_state.set(UsingTool::Eyedropper);
+            using_tool.emit(UsingTool::Eyedropper);
         })
     };
 
     let onclick_delete = {
         let using_tool_state = using_tool_state.clone();
+        let using_tool = props.using_tool.clone();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
-            using_tool_state.set(UsingTool::Delete)
+            using_tool_state.set(UsingTool::Delete);
+            using_tool.emit(UsingTool::Delete);
         })
     };
 
