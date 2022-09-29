@@ -13,18 +13,111 @@ pub struct OcTree {
 }
 
 impl OcTree {
-    pub fn new() -> Self {
+    /// Creat a OcTree with a sized AABB-Box
+    ///
+    /// # Performance
+    /// ```ignore
+    /// // Create a new OcTree with scope as 4
+    /// // its a AABB-Box as:
+    /// // frontX: 3, rightY: 3, topZ: 3,
+    /// // backX: -4, leftY: -4, bottom: -4,
+    /// let mut a = Self::from_scope(3);
+    /// 
+    /// // ...1.pos() = P3(3,-4,3)
+    /// // still in this scope,
+    /// // wouldn't extend the scope
+    /// a.insert(...1);
+    /// 
+    /// // ...2.pos() = P3(0,0,4)
+    /// // out of this scope,
+    /// // would extend the scope as 8 (4*2)
+    /// // its a AABB-Box as:
+    /// // frontX: 7, rightY: 7, topZ: 7,
+    /// // backX: -8, leftY: -8, bottom: -8,
+    /// a.insert(...2);
+    /// ```
+    /// 
+    /// # Example
+    /// ```
+    /// # use super::instance::Instance;
+    /// # use cgmath::Point3;
+    /// let mut a = Self::from_scope(3);
+    /// 
+    /// a.insert(Instance::default());
+    /// 
+    /// assert_eq!(
+    ///     a.get(Point3{ x: 0, y: 0, z: 0}),
+    ///     Instance::default(),
+    /// );
+    /// ```
+    pub fn from_scope(scope: usize) -> Self {
+        for i in (0..).map(|i| (2.0_f32.powf(scope as f32)) as usize) {
+            if i >= scope {
+                return Self {
+                    __value__: Node::default(),
+                    __len__: 0,
+                    __scope__: i,
+                };
+            }
+        }
+        
         Self::default()
     }
-
+    
+    /// get the Instance by its position
+    /// 
+    /// # Example
+    /// ```
+    /// # use super::instance::Instance;
+    /// # use cgmath::Point3;
+    /// let mut a = Self::from_scope(3);
+    /// 
+    /// a.insert(Instance::default());
+    /// 
+    /// assert_eq!(
+    ///     a.get(Point3{ x: 0, y: 0, z: 0}),
+    ///     Instance::default(),
+    /// );
+    /// ```
     pub fn get(&self, pos: Point3<i32>) -> Option<Instance> {
         self.__value__.get(pos)
     }
-
-    pub fn into_iter(self) -> iter::IntoIter {
-        iter::IntoIter::new(self)
+    
+    /// return a iterator for all the instances.
+    /// 
+    /// Index as x++ -overflow-> y++ -overflow-> z++
+    /// 
+    /// # Examples
+    /// ```
+    /// # use super::instance::Instance;
+    /// # use cgmath::Point3;
+    /// let mut a = Self::from_scope(3);
+    /// 
+    /// a.insert(Instance::default());
+    /// 
+    /// assert_eq!(a.iter().next(), Some(Instance::default()));
+    /// ```
+    pub fn iter(&self) -> iter::RefIter {
+        iter::RefIter::new(self)
     }
-
+    
+    /// - loop:
+    ///     - if in scope {driect insert}
+    ///     - else {extend}
+    /// 
+    /// # Example
+    /// ```
+    /// # use super::instance::Instance;
+    /// # use cgmath::Point3;
+    /// let mut a = Self::from_scope(3);
+    /// 
+    /// a.insert(Instance::default());
+    /// 
+    /// assert_eq!(
+    ///     a.get(Point3{ x: 0, y: 0, z: 0}),
+    ///     Instance::default(),
+    /// );
+    /// ```
     pub fn insert(&mut self, v: Instance) {
         self.__len__ += 1;
 
@@ -48,9 +141,13 @@ impl OcTree {
     }
 
     fn update_scope(&mut self, new_scope: usize) {
-        let mut new = Self::new();
+        let mut new = Self::from_scope(new_scope);
 
-        todo!()
+        for i in self.iter() {
+            new.insert(i);
+        }
+
+        *self = new;
     }
 }
 
@@ -172,13 +269,5 @@ impl Trunk {
     fn get(&self, pos: Point3<i32>) -> Option<Instance> {
         let toward = super::toward(pos, self.central);
         self.branches[toward].get(pos)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn is_octree_works() {
-        todo!()
     }
 }

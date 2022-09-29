@@ -1,13 +1,13 @@
 use cgmath::Point3;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IntoIter {
-    oc_tree: super::OcTree,
+pub struct RefIter<'a> {
+    oc_tree: &'a super::OcTree,
     counter: AabbCounter,
 }
 
-impl IntoIter {
-    pub(super) fn new(oc_tree: super::OcTree) -> Self {
+impl<'a> RefIter<'a> {
+    pub(super) fn new(oc_tree: &'a super::OcTree) -> Self {
         Self {
             counter: AabbCounter::new(oc_tree.__scope__),
             oc_tree,
@@ -15,7 +15,7 @@ impl IntoIter {
     }
 }
 
-impl Iterator for IntoIter {
+impl<'a> Iterator for RefIter<'a> {
     type Item = crate::state::scenes::instance::Instance;
 
     fn next(&mut self) -> Option<Self::Item> {
