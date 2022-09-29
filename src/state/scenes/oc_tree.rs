@@ -1,7 +1,7 @@
-use cgmath::{Point3, Vector3};
-use std::rc::Rc;
+use super::instance::Instance;
+use cgmath::Point3;
 
-use super::{aabb::AABB, instance::Instance};
+pub mod Iter;
 
 const CENTRAL: Point3<i32> = Point3 { x: 0, y: 0, z: 0 };
 
@@ -9,7 +9,7 @@ const CENTRAL: Point3<i32> = Point3 { x: 0, y: 0, z: 0 };
 pub struct OcTree {
     value: Node,
     len: usize,
-    scope: usize,
+    counter: Iter::AabbCounter,
 }
 
 impl OcTree {
@@ -17,29 +17,33 @@ impl OcTree {
         Self::default()
     }
 
+    pub fn get(&self, pos: Point3<i32>) -> Option<&Instance> {
+        self.value.get(pos)
+    }
+
     pub fn insert(&mut self, v: Instance) {
         self.len += 1;
 
         loop {
             if self.is_in_scope(&v.pos()) {
-                self.value.insert(v, CENTRAL, self.scope);
+                self.value.insert(v, CENTRAL, self.counter.scope());
                 break;
             } else {
-                self.update_scope(self.scope * 2);
+                self.update_scope(self.counter.scope() * 2);
             }
         }
     }
 
     fn is_in_scope(&self, p: &Point3<i32>) -> bool {
-        p.x > -(self.scope as i32)
-            && p.x <= self.scope as i32
-            && p.y > -(self.scope as i32)
-            && p.y <= self.scope as i32
-            && p.z > -(self.scope as i32)
-            && p.z <= self.scope as i32
+        p.x > -(self.counter.scope() as i32)
+            && p.x <= self.counter.scope() as i32
+            && p.y > -(self.counter.scope() as i32)
+            && p.y <= self.counter.scope() as i32
+            && p.z > -(self.counter.scope() as i32)
+            && p.z <= self.counter.scope() as i32
     }
 
-    fn update_scope(&self, scope: usize) -> bool {
+    fn update_scope(&self, new_scope: usize) {
         todo!()
     }
 }
@@ -49,7 +53,7 @@ impl Default for OcTree {
         Self {
             value: Node::default(),
             len: 0,
-            scope: 0,
+            counter: Iter::AabbCounter::default(),
         }
     }
 }
@@ -76,6 +80,14 @@ impl Node {
                 ))
             }
             Node::Leaf(None) => *self = Node::Leaf(Some(v)),
+        }
+    }
+
+    fn get(&self, pos: Point3<i32>) -> Option<&Instance> {
+        match self {
+            Node::Trunk(t) => t.get(pos),
+            Node::Leaf(Some(v)) => Some(v),
+            Node::Leaf(None) => None,
         }
     }
 
@@ -149,6 +161,11 @@ impl Trunk {
 
     fn insert(&mut self, offset: usize, v: Instance) {
         self.branches[v.toward(self.central)].insert(v, self.central, offset / 2)
+    }
+
+    fn get(&self, pos: Point3<i32>) -> Option<&Instance> {
+        let toward = super::toward(pos, self.central);
+        self.branches[toward].get(pos)
     }
 }
 

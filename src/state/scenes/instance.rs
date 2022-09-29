@@ -21,18 +21,6 @@ impl Instance {
     /// - self at above of the other
     ///     - +4
     pub fn toward(&self, other: cgmath::Point3<i32>) -> usize {
-        let mut ans = 0;
-
-        if self.position.x >= other.x {
-            ans += 1
-        };
-        if self.position.y >= other.y {
-            ans += 2
-        };
-        if self.position.z >= other.z {
-            ans += 4
-        };
-
-        ans
+        super::toward(self.pos(), other)
     }
 }
