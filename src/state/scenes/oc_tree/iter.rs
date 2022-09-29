@@ -1,10 +1,43 @@
 use cgmath::Point3;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IntoIter {
+    oc_tree: super::OcTree,
+    counter: AabbCounter,
+}
+
+impl IntoIter {
+    pub(super) fn new(oc_tree: super::OcTree) -> Self {
+        Self {
+            counter: AabbCounter::new(oc_tree.__scope__),
+            oc_tree,
+        }
+    }
+}
+
+impl Iterator for IntoIter {
+    type Item = crate::state::scenes::instance::Instance;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if let Some(pos) = self.counter.next() {
+                if let Some(ans) = self.oc_tree.get(pos) {
+                    return Some(ans);
+                } else {
+                    continue;
+                }
+            } else {
+                return None;
+            }
+        }
+    }
+}
+
 /// pos iterator for 3d AABB-box
 /// # Example
 /// ```
 /// let mut ac = super::AabbCounter::new(1);
-/// 
+///
 /// assert_eq!(ac.next(), Some(Point3 { x: 0, y: -1, z: -1 }));
 /// assert_eq!(ac.next(), Some(Point3 { x: -1, y: 0, z: -1 }));
 /// assert_eq!(ac.next(), Some(Point3 { x: 0, y: 0, z: -1 }));
@@ -25,7 +58,7 @@ impl AabbCounter {
         Self {
             scope,
             pos: Point3 {
-                x: -(scope as i32),
+                x: -(scope as i32) - 1,
                 y: -(scope as i32),
                 z: -(scope as i32),
             },
@@ -34,6 +67,10 @@ impl AabbCounter {
 
     pub(super) fn scope(&self) -> usize {
         self.scope
+    }
+
+    pub(super) fn pos(&self) -> Point3<i32> {
+        self.pos
     }
 }
 

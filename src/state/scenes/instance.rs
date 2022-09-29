@@ -24,3 +24,12 @@ impl Instance {
         super::toward(self.pos(), other)
     }
 }
+
+impl Default for Instance {
+    fn default() -> Self {
+        Self {
+            position: cgmath::Point3 { x: 0, y: 0, z: 0 },
+            style_id: "".to_owned(),
+        }
+    }
+}

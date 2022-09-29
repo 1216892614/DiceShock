@@ -1,15 +1,15 @@
 use super::instance::Instance;
 use cgmath::Point3;
 
-pub mod Iter;
+pub mod iter;
 
 const CENTRAL: Point3<i32> = Point3 { x: 0, y: 0, z: 0 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OcTree {
-    value: Node,
-    len: usize,
-    counter: Iter::AabbCounter,
+    __value__: Node,
+    __len__: usize,
+    __scope__: usize,
 }
 
 impl OcTree {
@@ -17,33 +17,39 @@ impl OcTree {
         Self::default()
     }
 
-    pub fn get(&self, pos: Point3<i32>) -> Option<&Instance> {
-        self.value.get(pos)
+    pub fn get(&self, pos: Point3<i32>) -> Option<Instance> {
+        self.__value__.get(pos)
+    }
+
+    pub fn into_iter(self) -> iter::IntoIter {
+        iter::IntoIter::new(self)
     }
 
     pub fn insert(&mut self, v: Instance) {
-        self.len += 1;
+        self.__len__ += 1;
 
         loop {
             if self.is_in_scope(&v.pos()) {
-                self.value.insert(v, CENTRAL, self.counter.scope());
+                self.__value__.insert(v, CENTRAL, self.__scope__);
                 break;
             } else {
-                self.update_scope(self.counter.scope() * 2);
+                self.update_scope(self.__scope__ * 2);
             }
         }
     }
 
     fn is_in_scope(&self, p: &Point3<i32>) -> bool {
-        p.x > -(self.counter.scope() as i32)
-            && p.x <= self.counter.scope() as i32
-            && p.y > -(self.counter.scope() as i32)
-            && p.y <= self.counter.scope() as i32
-            && p.z > -(self.counter.scope() as i32)
-            && p.z <= self.counter.scope() as i32
+        p.x > -(self.__scope__ as i32)
+            && p.x <= self.__scope__ as i32
+            && p.y > -(self.__scope__ as i32)
+            && p.y <= self.__scope__ as i32
+            && p.z > -(self.__scope__ as i32)
+            && p.z <= self.__scope__ as i32
     }
 
-    fn update_scope(&self, new_scope: usize) {
+    fn update_scope(&mut self, new_scope: usize) {
+        let mut new = Self::new();
+
         todo!()
     }
 }
@@ -51,9 +57,9 @@ impl OcTree {
 impl Default for OcTree {
     fn default() -> Self {
         Self {
-            value: Node::default(),
-            len: 0,
-            counter: Iter::AabbCounter::default(),
+            __value__: Node::default(),
+            __len__: 0,
+            __scope__: 0,
         }
     }
 }
@@ -83,10 +89,10 @@ impl Node {
         }
     }
 
-    fn get(&self, pos: Point3<i32>) -> Option<&Instance> {
+    fn get(&self, pos: Point3<i32>) -> Option<Instance> {
         match self {
             Node::Trunk(t) => t.get(pos),
-            Node::Leaf(Some(v)) => Some(v),
+            Node::Leaf(Some(v)) => Some(v.clone()),
             Node::Leaf(None) => None,
         }
     }
@@ -163,7 +169,7 @@ impl Trunk {
         self.branches[v.toward(self.central)].insert(v, self.central, offset / 2)
     }
 
-    fn get(&self, pos: Point3<i32>) -> Option<&Instance> {
+    fn get(&self, pos: Point3<i32>) -> Option<Instance> {
         let toward = super::toward(pos, self.central);
         self.branches[toward].get(pos)
     }
