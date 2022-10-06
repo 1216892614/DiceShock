@@ -1,0 +1,20 @@
+[package]
+name = "sketchpad"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[build]
+target = "wasm32-unknown-unknown"
+
+[dependencies]
+yew = "0.19.3"
+yew-canvas = "0.2.1"
+
+[dependencies.web-sys]
+version = "0.3.60"
+features = ["WebGl2RenderingContext", "HtmlCanvasElement"]
+
+[dependencies.wgpu]
+version = "0.13.1"
+features = ["webgl"]

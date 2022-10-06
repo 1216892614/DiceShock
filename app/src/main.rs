@@ -30,7 +30,7 @@ fn app() -> Html {
                     margin: 0;
                 "
             >
-                <components::sketchpad::Sketchpad />
+                <sketchpad::Sketchpad />
                 <div style="height: 100%; width: 100%; margin: 0 0 0 -100%;">
                     <components::kit_bar::KitBar {using_tool}/>
                     <div style="height: 100%; width: 100%"></div>

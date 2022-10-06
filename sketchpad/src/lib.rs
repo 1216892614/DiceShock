@@ -6,7 +6,7 @@ use web_sys::WebGl2RenderingContext;
 mod rander;
 
 #[function_component(Sketchpad)]
-pub(crate) fn sketchpad() -> Html {
+pub fn sketchpad() -> Html {
     let rander = rander::Rander{};
 
     html!(

@@ -1,4 +1,5 @@
 use cgmath::Point3;
+use crate::scenes::instance::Instance;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RefIter<'a> {
@@ -16,7 +17,7 @@ impl<'a> RefIter<'a> {
 }
 
 impl<'a> Iterator for RefIter<'a> {
-    type Item = crate::state::scenes::instance::Instance;
+    type Item = Instance;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -36,8 +37,10 @@ impl<'a> Iterator for RefIter<'a> {
 /// pos iterator for 3d AABB-box
 /// # Example
 /// ```
-/// let mut ac = super::AabbCounter::new(1);
+/// # use cgmath::Point3;
+/// let mut ac = AabbCounter::new(1);
 ///
+/// assert_eq!(ac.next(), Some(Point3 { x: -1, y: -1, z: -1 }));
 /// assert_eq!(ac.next(), Some(Point3 { x: 0, y: -1, z: -1 }));
 /// assert_eq!(ac.next(), Some(Point3 { x: -1, y: 0, z: -1 }));
 /// assert_eq!(ac.next(), Some(Point3 { x: 0, y: 0, z: -1 }));

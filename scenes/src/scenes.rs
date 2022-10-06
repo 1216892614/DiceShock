@@ -1,8 +1,7 @@
 use cgmath::Point3;
 
-pub(crate) mod aabb;
-pub(crate) mod instance;
-pub(crate) mod oc_tree;
+pub mod instance;
+pub mod oc_tree;
 
 /// left handed position
 /// - self at front of the other

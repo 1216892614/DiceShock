@@ -13,7 +13,7 @@ pub struct OcTree {
 }
 
 impl OcTree {
-    /// Creat a OcTree with a sized AABB-Box
+    /// Create a OcTree with a sized AABB-Box
     ///
     /// # Performance
     /// ```ignore
@@ -22,12 +22,12 @@ impl OcTree {
     /// // frontX: 3, rightY: 3, topZ: 3,
     /// // backX: -4, leftY: -4, bottom: -4,
     /// let mut a = Self::from_scope(3);
-    /// 
+    ///
     /// // ...1.pos() = P3(3,-4,3)
     /// // still in this scope,
     /// // wouldn't extend the scope
     /// a.insert(...1);
-    /// 
+    ///
     /// // ...2.pos() = P3(0,0,4)
     /// // out of this scope,
     /// // would extend the scope as 8 (4*2)
@@ -36,18 +36,18 @@ impl OcTree {
     /// // backX: -8, leftY: -8, bottom: -8,
     /// a.insert(...2);
     /// ```
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use super::instance::Instance;
     /// # use cgmath::Point3;
     /// let mut a = Self::from_scope(3);
-    /// 
+    ///
     /// a.insert(Instance::default());
-    /// 
+    ///
     /// assert_eq!(
-    ///     a.get(Point3{ x: 0, y: 0, z: 0}),
-    ///     Instance::default(),
+    ///     a.get(Point3 { x: 0, y: 0, z: 0 }),
+    ///     Some(Instance::default())
     /// );
     /// ```
     pub fn from_scope(scope: usize) -> Self {
@@ -60,62 +60,62 @@ impl OcTree {
                 };
             }
         }
-        
+
         Self::default()
     }
-    
+
     /// get the Instance by its position
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use super::instance::Instance;
     /// # use cgmath::Point3;
     /// let mut a = Self::from_scope(3);
-    /// 
+    ///
     /// a.insert(Instance::default());
-    /// 
+    ///
     /// assert_eq!(
-    ///     a.get(Point3{ x: 0, y: 0, z: 0}),
-    ///     Instance::default(),
+    ///     a.get(Point3 { x: 0, y: 0, z: 0 }),
+    ///     Some(Instance::default())
     /// );
     /// ```
     pub fn get(&self, pos: Point3<i32>) -> Option<Instance> {
         self.__value__.get(pos)
     }
-    
+
     /// return a iterator for all the instances.
-    /// 
+    ///
     /// Index as x++ -overflow-> y++ -overflow-> z++
-    /// 
+    ///
     /// # Examples
     /// ```
     /// # use super::instance::Instance;
     /// # use cgmath::Point3;
     /// let mut a = Self::from_scope(3);
-    /// 
+    ///
     /// a.insert(Instance::default());
-    /// 
+    ///
     /// assert_eq!(a.iter().next(), Some(Instance::default()));
     /// ```
     pub fn iter(&self) -> iter::RefIter {
         iter::RefIter::new(self)
     }
-    
+
     /// - loop:
     ///     - if in scope {driect insert}
     ///     - else {extend}
-    /// 
+    ///
     /// # Example
     /// ```
     /// # use super::instance::Instance;
     /// # use cgmath::Point3;
     /// let mut a = Self::from_scope(3);
-    /// 
+    ///
     /// a.insert(Instance::default());
-    /// 
+    ///
     /// assert_eq!(
-    ///     a.get(Point3{ x: 0, y: 0, z: 0}),
-    ///     Instance::default(),
+    ///     a.get(Point3 { x: 0, y: 0, z: 0 }),
+    ///     Some(Instance::default())
     /// );
     /// ```
     pub fn insert(&mut self, v: Instance) {
@@ -269,5 +269,50 @@ impl Trunk {
     fn get(&self, pos: Point3<i32>) -> Option<Instance> {
         let toward = super::toward(pos, self.central);
         self.branches[toward].get(pos)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn oc_tree_base_work() {
+        let mut a = OcTree::from_scope(3);
+
+        a.insert(Instance::default());
+
+        assert_eq!(
+            a.get(Point3 { x: 0, y: 0, z: 0 }),
+            Some(Instance::default())
+        );
+    }
+
+    #[test]
+    fn oc_tree_work() {
+        let instances: Vec<_> = (0..100)
+            .map(|i| {
+                Instance::new(
+                    Point3 {
+                        x: -i,
+                        y: i - 1,
+                        z: i * 2,
+                    },
+                    i.to_string(),
+                )
+            })
+            .collect();
+
+        let mut octree = OcTree::from_scope(4);
+
+        for v in instances.clone() {
+            octree.insert(v);
+        }
+
+        for v in instances {
+            let gv = octree.get(v.pos());
+
+            assert_eq!(gv, Some(v));
+        }
     }
 }

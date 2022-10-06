@@ -247,11 +247,12 @@ dependencies = [
  "image",
  "js-sys",
  "once_cell",
- "sketchpad",
  "tobj",
  "wasm-bindgen-futures",
  "web-sys",
+ "wgpu",
  "yew",
+ "yew-canvas",
 ]
 
 [[package]]
@@ -951,13 +952,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4501abdff3ae82a1c1b477a17252eb69cee9e66eb915c1abaa4f44d873df9f09"
 
 [[package]]
-name = "scenes"
-version = "0.1.0"
-dependencies = [
- "cgmath",
-]
-
-[[package]]
 name = "scoped-tls-hkt"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1022,16 +1016,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "sketchpad"
-version = "0.1.0"
-dependencies = [
- "web-sys",
- "wgpu",
- "yew",
- "yew-canvas",
 ]
 
 [[package]]
